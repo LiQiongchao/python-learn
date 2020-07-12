@@ -11,3 +11,4 @@ for x in range(1, 10):
         print('%d * %d = %d' %(y,x, x*y), end='\t')
     print()
 
+
