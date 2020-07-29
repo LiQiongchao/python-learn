@@ -1,4 +1,5 @@
 """
+tkinter 开发GUI
 
 @Author: QiongchaoLi
 @Date: 2020/7/29 13:22
@@ -14,8 +15,8 @@ def main():
     def change_label_text():
         nonlocal flag
         flag = not flag
-        color, msg = ('red', 'Hello, world!')\
-        if flag else ('blue', 'Goodbye, world!')
+        color, msg = ('red', 'Hello, world!') \
+            if flag else ('blue', 'Goodbye, world!')
         label.config(text=msg, fg=color)
 
     # 退出
@@ -29,22 +30,19 @@ def main():
     top.geometry('250x160')
     top.title('游戏')
     # 创建标签对象并添加到顶层窗口
-    label = tkinter.Label(top, text = 'Hello, world', font='Arial -32', fg = 'red')
-    label.pack(expand = 1)
+    label = tkinter.Label(top, text='Hello, world', font='Arial -32', fg='red')
+    label.pack(expand=1)
     # 创建一个装按钮的窗口
     panel = tkinter.Frame(top)
     # 创建按钮对象 指定添加到哪个容器中 通过command参数绑定事件回调函数
-    button1 = tkinter.Button(panel, text = '修改', command=change_label_text)
+    button1 = tkinter.Button(panel, text='修改', command=change_label_text)
     button1.pack(side='left')
-    button1 = tkinter.Button(panel, text = '退出', command=confirm_to_quit)
+    button1 = tkinter.Button(panel, text='退出', command=confirm_to_quit)
     button1.pack(side='right')
     panel.pack(side='bottom')
     # 开启主事件循环
     tkinter.mainloop()
 
 
-
 if __name__ == '__main__':
     main()
-
-
