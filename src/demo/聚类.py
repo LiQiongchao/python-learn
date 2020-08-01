@@ -3,7 +3,7 @@ import openpyxl
 import datetime
 import time
 start_time = time.time()
-file_path=r"D:\聚类"
+file_path=r"C:/Users/Qiongchao/Documents/华中/"
 file_name_source = "4月联通数据.xlsx"
 file_name_target = "4月聚类结果.xlsx"
 
