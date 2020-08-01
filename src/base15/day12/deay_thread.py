@@ -16,9 +16,9 @@ class MyThread(Thread):
             print('hello, ', self.getName())
 
 
-def thread_task():
+def thread_task(num = 10):
     thread = []
-    for i in range(5):
+    for i in range(num):
         t = MyThread()
         t.start()
         thread.append(t)
@@ -30,18 +30,22 @@ def process_task():
     while True:
         print('hello')
 
-def process_start():
+
+def process_start(num = 10):
     process = []
-    for i in range(5):
+    for i in range(num):
         p = Process(target=process_task)
         p.start()
         process.append(p)
     for process in process:
         process.join()
 
+
 def main():
-    # thread_task()
-    process_start()
+    num = 12
+    # thread_task(num)
+    process_start(num)
+
 
 if __name__ == '__main__':
     main()
