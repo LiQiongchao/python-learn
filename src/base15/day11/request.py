@@ -9,7 +9,7 @@ import requests
 import json
 
 def main():
-    resp = requests.get("http://api.tianapi.com/it/index?key=5f13a9935a7efc1bba35465feab9f415&num=10")
+    resp = requests.get("http://api.tianapi.com/it/index?key=&num=10")
     print(resp.text)
     resp_json = json.loads(resp.text)
     if not int(resp_json['code']) == 200:
