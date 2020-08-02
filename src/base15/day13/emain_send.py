@@ -12,12 +12,12 @@ from smtplib import SMTP
 
 
 def main():
-    send = 'liqiongchao2012@163.com'
-    receivers = ['254679323@qq.com', send]
+    send = 'xxx@163.com'
+    receivers = ['xxx@qq.com', send]
     message = MIMEText('你好，请问明天您那边有时间吗?明天想邀请您来我们公司参观。顺便讨论一下上次说的合作的事情。', 'plain', 'utf-8')
     message['From'] = Header('lee', 'utf-8')
     message['To'] = Header('clancy', 'utf-8')
-    message['Subject'] = Header('oio欢迎您', 'utf-8')
+    message['Subject'] = Header('xxx欢迎您', 'utf-8')
     smtper = SMTP('smtp.163.com')
     smtper.login(send, '')
     smtper.sendmail(send, receivers, message.as_string())
