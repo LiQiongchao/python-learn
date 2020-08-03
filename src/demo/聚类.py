@@ -4,8 +4,8 @@ import datetime
 import time
 start_time = time.time()
 file_path=r"D:\聚类"
-file_name_source = "4月联通数据.xlsx"
-file_name_target = "4月聚类结果.xlsx"
+file_name_source = "数据.xlsx"
+file_name_target = "结果.xlsx"
 
 
 wb_s = openpyxl.load_workbook(os.path.join(file_path,file_name_source)) #导入原表格
@@ -97,7 +97,7 @@ for i in range(2,ws_s.max_row+1): #遍历源表格
 
 
 
-wb_t.save("联通聚类.xlsx")
+wb_t.save("聚类.xlsx")
 print(f'完成，用时为{time.time()-start_time}秒')
                             
                             
