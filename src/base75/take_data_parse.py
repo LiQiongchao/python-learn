@@ -50,12 +50,13 @@ print(resp.text)
 cookies_jar = requests.cookies.RequestsCookieJar()
 cookies_jar.set('cookie4', 'val4', domain='httpbin.org', path='/cookies')
 cookies_jar.set('cookie5', 'val5', domain='httpbin.org', path='/elsewhere')
-resp = requests.get('http://httpbin.org/cookies', cookies = cookies_jar)
+resp = requests.get('http://httpbin.org/cookies', cookies=cookies_jar)
 print(resp.text)
 
+print('----------------------------------proxy------------------------------------------')
+resp = requests.get('https://www.taobao.com',
+                    proxies={'http:': 'http://10.10.1.10:3128', 'https': 'http://10.10.1.10:1080'})
+print(resp.status_code)
 
-
-
-
-
-
+print('----------------------------------timeout------------------------------------------')
+requests.get('https://github.com', timeout=0.01)
