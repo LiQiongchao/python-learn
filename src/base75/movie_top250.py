@@ -61,7 +61,8 @@ def parse_movie_with_lxml():
 
 
 def main():
-    parse_movie_with_regular()
+    # parse_movie_with_regular()
+    parse_movie_with_lxml()
 
 
 if __name__ == '__main__':
