@@ -16,8 +16,9 @@ def main():
     # resp = requests.get(url)
     # soup = BeautifulSoup(resp.text, 'html.parser')
 
-    # 合作selenium动态获取
-    driver = webdriver.Chrome()
+    # 合作selenium动态获取，使用Chrome会有问题
+    # driver = webdriver.Chrome()
+    driver = webdriver.Firefox()
     driver.get(url=url)
     soup = BeautifulSoup(driver.page_source, 'html.parser')
     for img in soup.select('img[src]'):
