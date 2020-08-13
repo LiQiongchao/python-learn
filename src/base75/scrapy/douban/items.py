@@ -14,7 +14,7 @@
 import scrapy
 
 
-class DoubanScrapy(scrapy.Item):
+class DoubanItem(scrapy.Item):
     name = scrapy.Field()
     year = scrapy.Field()
     score = scrapy.Field()
