@@ -9,12 +9,17 @@ import os
 import openpyxl
 
 # 根文件夹
-BASE_DIR = 'C:/Users/Qiongchao/Documents/zhong'
+BASE_DIR = 'D:\\weiyunSyncFolder\\SyncFolder-653028346\\temp\\zhong'
 
 # 要处理的所有的CSV文件的文件夹名
 SOURCE_DIR = 'calculate'
 # 输出结果的文件名
 RESULT_DIR = 'calculateResult'
+
+# 结果集在总结果中的下标（即要计算的列的位置，如‘上行PRB平均利用率(%)’的位置是4，从0开始。）
+result_indexes = (4, 13, 16, 19, 20, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 73, 74, 75, 79)
+# RPC最大连接数的列数
+RPC_connect_max_count = 36
 
 
 # 读取所有的csv文件
@@ -37,14 +42,12 @@ def cal_csv(file_dir):
     for file in files:
         # 拼接完全文件路径名
         fill_file = os.path.join(file_dir, file)
-        # 结果集在总结果中的下标（即要计算的列的位置，如‘上行PRB平均利用率(%)’的位置是4，从0开始。）
-        result_indexes = (4, 13, 16, 19, 20, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 73, 74, 75, 79)
-        # RPC最大连接数的列数
-        RPC_connect_max_count = 36
+
         # 结果集的头信息
         result_header = []
         result_rows = {}
         # 统计ecgi的个数，用于求平均
+        # {ecgi1, 1, ecgi2, 3}
         ecgi_cal = {}
         # 找出每个 ECGI 的3个最大值
         ecgi_max_map = {}
@@ -64,7 +67,8 @@ def cal_csv(file_dir):
                 ecgi_cal[ecgi] = ecgi_cal.setdefault(ecgi, 0) + 1
 
                 # 取出当前需要计算的数据
-                max_row = [ecgi]
+                # [ecgi, 上行PRB，下午PRB。。。]
+                row_for_max = [ecgi]
 
                 # 初始化列表，长度为result_indexes的长度，并赋初始值为 0.0
                 init_row = [0.0 for i in range(len(result_indexes))]
@@ -76,7 +80,7 @@ def cal_csv(file_dir):
                 temp_19 = result_row[19]
                 for j in range(1, len(result_indexes)):
                     # 取原始值，用于计算是否是三个最大值
-                    max_row.append(float(row[result_indexes[j]]))
+                    row_for_max.append(float(row[result_indexes[j]]))
                     result_row[j] += float(row[result_indexes[j]])
                 # 计算并放入最大值
                 result_row[12] = max(temp_12, float(row[result_indexes[12]]))
@@ -85,17 +89,21 @@ def cal_csv(file_dir):
                 result_rows[ecgi] = result_row
 
                 # 计算关于最大值的问题
+                max_third = list()
                 if ecgi in ecgi_max_map.keys():
-                    max_list = list(ecgi_max_map.get(ecgi))
-                    if not max_list:
-                        max_list[ecgi]
-                    if temp[12] > max_row[12]:
-                        max_third[ecgi] = max_row
-                elif len(max_third) < 3:
-                    max_third[ecgi] = max_row
+                    max_third = list(ecgi_max_map.get(ecgi))
+
+                if len(max_third) < 3:
+                    max_third.append(row_for_max)
+                    # 按 上行PRB平均利用率(%) 升序排序
+                    max_third.sort(key=lambda elem: elem[12])
                 else:
-                    for file in files:
-                        pass
+                    for i in range(3):
+                        temp = max_third[i]
+                        if temp[12] < row_for_max[12]:
+                            max_third[i] = row_for_max
+                            ecgi_max_map[ecgi] = max_third
+                            continue
 
         # 计算平均值，总和，等值
 
