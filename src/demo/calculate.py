@@ -42,108 +42,125 @@ def read_files(fil_dir):
 
 
 # 计算csv文件
+def save_date_to_excel(file, result_header, result_rows, ecgi_cal, ecgi_max_map):
+    # 计算平均值，总和，等值
+    wb = openpyxl.Workbook()
+    ws1 = wb.active
+    # 写入头标题
+    for i in range(len(result_header)):
+        ws1.cell(row=1, column=i + 1, value=result_header[i])
+    # 写入行数据
+    row_num = 2
+    for ecgi_key in result_rows.keys():
+        result_row = result_rows.get(ecgi_key)
+        ecgi = result_row[0]
+        for col in range(len(result_header)):
+            cell_val = result_row[col]
+            if col in ave_indexes:
+                cell_val = cell_val / ecgi_cal.get(ecgi)
+            ws1.cell(row_num, col + 1, cell_val)
+        row_num += 1
+    # 写入每个ecgi的三个最大值
+    ws2 = wb.create_sheet('Sheet1')
+    # 写入头标题
+    for i in range(len(result_header)):
+        ws2.cell(row=1, column=i + 1, value=result_header[i])
+    row_num = 2
+    for ecgi_key in ecgi_max_map.keys():
+        max_third = ecgi_max_map.get(ecgi_key)
+        for i in range(len(max_third)):
+            max_vals = max_third[i]
+            for col in range(len(result_header)):
+                ws2.cell(row_num, col + 1, max_vals[col])
+        row_num += 1
+    file_name = file.rsplit(".")[0] + '.xlsx'
+    print(file_name, " 计算完成！")
+    wb.save(os.path.join(BASE_DIR, RESULT_DIR, file_name))
+
+
+def cal_file(file_dir, file):
+    # 拼接完全文件路径名
+    fill_file = os.path.join(file_dir, file)
+    # 结果集的头信息
+    result_header = []
+    # {ecgi:[], ecgi2:[]}
+    result_rows = {}
+    # 统计ecgi的个数，用于求平均
+    # {ecgi1, 1, ecgi2, 3}
+    ecgi_cal = {}
+    # 找出每个 ECGI 的3个最大值
+    ecgi_max_map = {}
+    # 读取一个 CSV 文件
+    with open(fill_file, encoding='utf-8') as f:
+        source_list = list(csv.reader(f))
+        # 提取头的名称（即第一行的信息）
+        header = list(source_list[0])
+        # 提取结果的文件头名称
+        for count in result_indexes:
+            result_header.append(header[count])
+        # 循环取每一行信息（从第二行开始取）
+        for i in range(1, len(source_list)):
+            row = source_list[i]
+
+            ecgi = row[4]
+            ecgi_cal[ecgi] = ecgi_cal.setdefault(ecgi, 0) + 1
+
+            # 取出当前需要计算的数据
+            # [ecgi, 上行PRB，下午PRB。。。]
+            row_for_max = [ecgi]
+
+            # 初始化列表，长度为result_indexes的长度，并赋初始值为 0.0
+            init_row = [0.0 for i in range(len(result_indexes))]
+            init_row.insert(0, ecgi)
+            result_row = result_rows.setdefault(ecgi, init_row)
+            # 根据ECGI计算平均，总和，最大等信息
+            temp_12 = result_row[12]
+            temp_13 = result_row[13]
+            temp_19 = result_row[19]
+            for j in range(1, len(result_indexes)):
+                # 取原始值，用于计算是否是三个最大值
+                cell_val = row[result_indexes[j]]
+                if not cell_val:
+                    cell_val = 0
+                float_val = float(cell_val)
+                row_for_max.append(float_val)
+                result_row[j] += float_val
+            # 计算并放入最大值
+            result_row[12] = max(temp_12, float(row[result_indexes[12]] if row[result_indexes[12]] else 0))
+            result_row[13] = max(temp_13, float(row[result_indexes[13]] if row[result_indexes[13]] else 0))
+            result_row[19] = max(temp_19, float(row[result_indexes[19]] if row[result_indexes[19]] else 0))
+            result_rows[ecgi] = result_row
+
+            # 计算关于最大值的问题
+            max_third = list()
+            if ecgi in ecgi_max_map.keys():
+                max_third = list(ecgi_max_map.get(ecgi))
+
+            if len(max_third) < 3:
+                max_third.append(row_for_max)
+                # 按 上行PRB平均利用率(%) 升序排序
+                max_third.sort(key=lambda elem: elem[12])
+                ecgi_max_map[ecgi] = max_third
+            else:
+                for i in range(3):
+                    temp = max_third[i]
+                    if temp[12] < row_for_max[12]:
+                        max_third[i] = row_for_max
+                        max_third.sort(key=lambda elem: elem[12])
+                        ecgi_max_map[ecgi] = max_third
+                        break
+
+    # 保存结果到excel
+    save_date_to_excel(file, result_header, result_rows, ecgi_cal, ecgi_max_map)
+    # return result_rows, ecgi_cal, ecgi_max_map
+
+
 def cal_csv(file_dir):
     # 获取目录下的所有文件名
     files = read_files(file_dir)
     for file in files:
-        # 拼接完全文件路径名
-        fill_file = os.path.join(file_dir, file)
-
-        # 结果集的头信息
-        result_header = []
-        # {ecgi:[], ecgi2:[]}
-        result_rows = {}
-        # 统计ecgi的个数，用于求平均
-        # {ecgi1, 1, ecgi2, 3}
-        ecgi_cal = {}
-        # 找出每个 ECGI 的3个最大值
-        ecgi_max_map = {}
-        # 读取一个 CSV 文件
-        with open(fill_file, encoding='utf-8') as f:
-            source_list = list(csv.reader(f))
-            # 提取头的名称（即第一行的信息）
-            header = list(source_list[0])
-            # 提取结果的文件头名称
-            for count in result_indexes:
-                result_header.append(header[count])
-            # 循环取每一行信息（从第二行开始取）
-            for i in range(1, len(source_list)):
-                row = source_list[i]
-
-                ecgi = row[4]
-                ecgi_cal[ecgi] = ecgi_cal.setdefault(ecgi, 0) + 1
-
-                # 取出当前需要计算的数据
-                # [ecgi, 上行PRB，下午PRB。。。]
-                row_for_max = [ecgi]
-
-                # 初始化列表，长度为result_indexes的长度，并赋初始值为 0.0
-                init_row = [0.0 for i in range(len(result_indexes))]
-                init_row.insert(0, ecgi)
-                result_row = result_rows.setdefault(ecgi, init_row)
-                # 根据ECGI计算平均，总和，最大等信息
-                temp_12 = result_row[12]
-                temp_13 = result_row[13]
-                temp_19 = result_row[19]
-                for j in range(1, len(result_indexes)):
-                    # 取原始值，用于计算是否是三个最大值
-                    row_for_max.append(float(row[result_indexes[j]]))
-                    result_row[j] += float(row[result_indexes[j]])
-                # 计算并放入最大值
-                result_row[12] = max(temp_12, float(row[result_indexes[12]]))
-                result_row[13] = max(temp_13, float(row[result_indexes[13]]))
-                result_row[19] = max(temp_19, float(row[result_indexes[19]]))
-                result_rows[ecgi] = result_row
-
-                # 计算关于最大值的问题
-                max_third = list()
-                if ecgi in ecgi_max_map.keys():
-                    max_third = list(ecgi_max_map.get(ecgi))
-
-                if len(max_third) < 3:
-                    max_third.append(row_for_max)
-                    # 按 上行PRB平均利用率(%) 升序排序
-                    max_third.sort(key=lambda elem: elem[12])
-                else:
-                    for i in range(3):
-                        temp = max_third[i]
-                        if temp[12] < row_for_max[12]:
-                            max_third[i] = row_for_max
-                            max_third.sort(key=lambda elem: elem[12])
-                            ecgi_max_map[ecgi] = max_third
-                            break
-
-        # 计算平均值，总和，等值
-        wb = openpyxl.Workbook()
-        ws1 = wb.create_sheet('sheet1')
-        # 写入头标题
-        for i in range(len(result_header)):
-            ws1.cell(row=1, column = i + 1, value=result_header[i])
-        # 写入行数据
-        row_num = 2
-        for index in range(len(result_rows)):
-            result_row = result_rows[index]
-            ecgi = result_row[0]
-            for col in range(len(result_header)):
-                cell_val = result_row[col]
-                if col in ave_indexes:
-                    cell_val = cell_val / ecgi_cal.get(ecgi)
-                ws1.cell(row_num, col + 1, cell_val)
-            row_num += 1
-        # 写入每个ecgi的三个最大值
-        ws2 = wb.create_sheet('sheet2')
-        # 写入头标题
-        for i in range(len(result_header)):
-            ws1.cell(row=1, column=i + 1, value=result_header[i])
-        row_num = 2
-        for ecgi_key in ecgi_max_map.keys():
-            max_third = ecgi_max_map.get(ecgi_key)
-            for i in range(len(max_third)):
-                max = max_third[i]
-                for col in range(len(result_header)):
-                    ws1.cell(row_num, col + 1, max[col])
-            row_num += 1
-        wb.save(os.path.join(BASE_DIR, RESULT_DIR, file))
+        # result_rows, ecgi_cal, ecgi_max_map = cal_file(file_dir, file)
+        cal_file(file_dir, file)
 
 
 def main():

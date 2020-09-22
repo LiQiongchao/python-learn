@@ -17,9 +17,16 @@ def test_reids():
     print(bytes.decode(str, encoding='Unicode'))
     print(MovieDecoder().decode(bytes.decode(str)).url)
 
+
+def result_multiple():
+    return 1,3,5
+
+
 def main():
-    list = []
-    print(type(list))
+    # print('统一时段小区级报表-天-20082709112700079.csv'.rsplit("."))
+    a, b, c = result_multiple()
+    # 1 3 5
+    print(a, b, c)
 
 
 if __name__ == '__main__':
