@@ -151,15 +151,15 @@ def cal_file(file_dir, file):
             global top_num_of_RPC_connect_max_count
             if len(max_third) < top_num_of_RPC_connect_max_count:
                 max_third.append(row_for_max)
-                # 按 上行PRB平均利用率(%) 升序排序
-                max_third.sort(key=lambda elem: elem[12])
+                # 按 RRC连接最大数 升序排序
+                max_third.sort(key=lambda elem: elem[13])
                 ecgi_max_map[ecgi] = max_third
             else:
-                for i in range(3):
+                for i in range(len(max_third)):
                     temp = max_third[i]
-                    if temp[12] < row_for_max[12]:
+                    if temp[13] < row_for_max[13]:
                         max_third[i] = row_for_max
-                        max_third.sort(key=lambda elem: elem[12])
+                        max_third.sort(key=lambda elem: elem[13])
                         ecgi_max_map[ecgi] = max_third
                         break
     # return result_rows, ecgi_cal, ecgi_max_map
