@@ -116,6 +116,8 @@ def cal_file(file_dir, file):
             result_row = result_rows.setdefault(ecgi, init_row)
             # 根据ECGI计算平均
             for j in range(1, len(result_indexes)):
+                if j not in ave_indexes:
+                    continue
                 # 取原始值，用于计算是否是三个最大值
                 cell_val = row[result_indexes[j]]
                 if not cell_val:
