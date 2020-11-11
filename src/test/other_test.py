@@ -21,12 +21,29 @@ def test_reids():
 def result_multiple():
     return 1,3,5
 
+def invertTest(rate, times, save_money):
+    '''
+    定投得利计算
+    :param rate: 年收益率
+    :param times: 投资多少年
+    :param save_money: 每次投入多少钱
+    :return:
+    '''
+    total_money = 0
+    for i in range(times):
+        total_money += save_money
+        total_money = total_money * (1 + rate)
+    return total_money
+
 
 def main():
     # print('统一时段小区级报表-天-20082709112700079.csv'.rsplit("."))
-    a, b, c = result_multiple()
+    # a, b, c = result_multiple()
     # 1 3 5
-    print(a, b, c)
+    # print(a, b, c)
+    years = 30
+    total_money = invertTest(0.1, years, 10000)
+    print("%s后，共有：%.2f" %(years, total_money))
 
 
 if __name__ == '__main__':
