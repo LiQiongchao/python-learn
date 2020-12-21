@@ -4,6 +4,8 @@
 @Author: QiongchaoLi
 @Date: 2020/8/17 16:04
 """
+from time import sleep
+
 from flask import Flask, request
 
 app = Flask(__name__)
@@ -12,6 +14,7 @@ app = Flask(__name__)
 # 主页
 @app.route('/', methods=['GET', 'POST'])
 def home():
+    sleep(10)
     return '<h1>Home</h1>'
 
 
