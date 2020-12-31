@@ -1329,7 +1329,6 @@ callLogs=[]
 # 解析话单
 def parse_call_log():
     cookies = {"ASP.NET_SessionId": "bfeomwh504t1ueqm3vf1jboh"}
-    log_list = []
     # 以 f开头表示在字符串内支持大括号内的python 表达式
     response = requests.post(url=URL, headers=HEADERS, cookies=cookies)
     # soup = bs4.BeautifulSoup(response.text, 'html.parser')
@@ -1339,9 +1338,9 @@ def parse_call_log():
     event_validation = soup.select_one('#__EVENTVALIDATION').attrs['value']
     view_state_generator = soup.select_one('#__VIEWSTATEGENERATOR').attrs['value']
     tag_arr_in_page = soup.select('#AspNetPager1 a')
-    next_page_href = tag_arr_in_page[len(tag_arr_in_page) - 2].attrs['href']
+    next_page_attrs = tag_arr_in_page[len(tag_arr_in_page) - 2].attrs
     has_next_page = True
-    if not next_page_href:
+    if not next_page_attrs.__contains__('href'):
         has_next_page = False
     print(has_next_page)
     # 查询所有的table子标签，第一个为标题
@@ -1376,8 +1375,15 @@ def parse_call_log():
         if recordUrl:
             recording = 1
         callDict['recording'] = recording
-        # print(callDict)
-        return
+        print(callDict)
+        callLogs.append(callDict)
+        # return
+
+    with open('calls.json', 'w', encoding='utf-8') as call_file:
+        for call in callLogs:
+            call_json = json.dumps(call)
+            call_file.writelines(call_json + '\n')
+    print("写存储完成!")
     return
 
 

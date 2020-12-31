@@ -26,14 +26,14 @@ HEADERS = {
     'Accept-Language': 'zh-CN,zh;q=0.9,en;q=0.8'
 }
 
-cookies = {"ASP.NET_SessionId": "bfeomwh504t1ueqm3vf1jboh"}
+cookies = {"ASP.NET_SessionId": "gxk4jtbs44m2ihirkmcxyxgp"}
 
 URL = "http://api.pjxx866.com/web/admio/a_calllog.aspx"
 
 TIME_PATTERN = "%Y-%m-%d %H:%M:%S"
 
 # 手机号的正则
-PHONE_PATTERN = re.compile(r"1[0-9]{10}")
+PHONE_PATTERN = re.compile(r"1[0-9]{9}")
 
 # 话单查询的开始时间与结束时间
 param_start_time = "2020-12-28 23:00"
@@ -85,10 +85,11 @@ def parse_all_call_log(form):
                 recording = 1
             callDict['recording'] = recording
             callLogs.append(callDict)
+        print(str(page_number) + '页统计完成!')
         # 检查是否有下一页
         tag_arr_in_page = soup.select('#AspNetPager1 a')
-        next_page_href = tag_arr_in_page[len(tag_arr_in_page) - 2].attrs['href']
-        if not next_page_href:
+        next_page_attrs = tag_arr_in_page[len(tag_arr_in_page) - 2].attrs
+        if not next_page_attrs.__contains__('href'):
             has_next_page = False
         # 准备下一次请求的参数
         page_number += 1
@@ -121,11 +122,28 @@ def parse_next_form_params(soup, page=1):
     return form
 
 
+def save_to_db(calls):
+    """
+    入库
+    格式:
+    {'tela': '18222787752', 'telb': '13820673169', 'telx': '+869717463395', 'startTime': '2012-12-30 11:25:20',
+    'endTime': '2012-12-30 11:25:37',
+    'recordUrl': 'http://rec.fj-dttx.com:8081/rec_r006/20201230/XT2012301345473252018222787752.wav', 'recording': 1}
+    :param calls:
+    :return:
+    """
+    with open('sphoneCalls.json', 'w', encoding='utf-8') as call_file:
+        call_json = json.dumps(calls)
+        call_file.write(call_json + '\n')
+    print("写存储完成!")
+
+
 def main():
     call_index_request = requests.post(url=URL, headers=HEADERS, cookies=cookies)
     soup = bs4.BeautifulSoup(call_index_request.text, 'html.parser')
     form = parse_next_form_params(soup)
     calls = parse_all_call_log(form)
+    save_to_db(calls)
 
 
 if __name__ == '__main__':
