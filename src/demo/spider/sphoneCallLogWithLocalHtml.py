@@ -1306,7 +1306,7 @@ $(document).ready(function() {
 </html>
 """
 
-URL = "http://api.pjxx866.com/web/admio/a_calllog.aspx"
+URL = "/web/admio/a_calllog.aspx"
 
 TIME_PATTERN = "%Y-%m-%d %H:%M:%S"
 

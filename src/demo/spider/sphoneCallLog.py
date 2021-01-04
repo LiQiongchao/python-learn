@@ -5,6 +5,7 @@
 @Date: 2020/8/8 13:40
 """
 import json
+import math
 import random
 import time
 from http.cookiejar import CookieJar
@@ -26,14 +27,14 @@ HEADERS = {
     'Accept-Language': 'zh-CN,zh;q=0.9,en;q=0.8'
 }
 
-cookies = {"ASP.NET_SessionId": "gxk4jtbs44m2ihirkmcxyxgp"}
+cookies = {"ASP.NET_SessionId": "uigxyk3pvvzgbmp4jxalnco5"}
 
 URL = "/web/admio/a_calllog.aspx"
 
 TIME_PATTERN = "%Y-%m-%d %H:%M:%S"
 
 # 手机号的正则
-PHONE_PATTERN = re.compile(r"1[0-9]{9}")
+PHONE_PATTERN = re.compile(r"1[0-9]{9,10}")
 
 # 话单查询的开始时间与结束时间
 param_start_time = "2020-12-28 23:00"
@@ -62,10 +63,11 @@ def parse_all_call_log(form):
             phones = PHONE_PATTERN.findall(td[1].text)
             callDict['tela'] = phones[0]
             callDict['telb'] = phones[1]
-            callDict['telx'] = td[2].text
-            startTime = '2012-' + td[5].text
+            # substr, cut out +86
+            callDict['telx'] = td[2].text[3:]
+            startTime = '2020-' + td[5].text
             start_timestamp = int(time.mktime(time.strptime(startTime, TIME_PATTERN)))
-            callDict['startTime'] = startTime
+            callDict['startTime'] = start_timestamp
             duration_str = td[6].text
             durationMinute = 0
             if duration_str.find('分') != -1:
@@ -74,7 +76,10 @@ def parse_all_call_log(form):
                 duration_str = durationArr[1]
             duration = durationMinute + int(duration_str.replace('秒', ''))
             end_time = start_timestamp + duration
-            callDict['endTime'] = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(end_time))
+            # callDict['endTime'] = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(end_time))
+            callDict['endTime'] = end_time
+            callDict['hold_time'] = duration
+            callDict['fee_time'] = math.ceil(duration/60)
             tagA = td[12].select_one('a')
             recordUrl = None
             if tagA:

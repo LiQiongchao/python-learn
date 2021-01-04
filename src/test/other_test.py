@@ -4,6 +4,7 @@
 @Author: QiongchaoLi
 @Date: 2020/8/23 17:41
 """
+import math
 from json import JSONDecoder
 
 from src.demo import DataBaseUtil
@@ -44,6 +45,9 @@ def main():
     years = 30
     total_money = invertTest(0.1, years, 10000)
     print("%s后，共有：%.2f" %(years, total_money))
+    duration = 62
+    print(math.ceil(duration/60))
+    print(duration / 60 + 1 if duration % 60 > 0 else 0)
 
 
 if __name__ == '__main__':

@@ -20,4 +20,5 @@ print(int(timestamp)) # 1609379890
 
 print(int(time.mktime(time.strptime('2012-12-30 11:25:20',"%Y-%m-%d %H:%M:%S"))))
 
+print(time.time())
 
