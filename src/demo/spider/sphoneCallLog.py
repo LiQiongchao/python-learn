@@ -28,7 +28,7 @@ HEADERS = {
 
 cookies = {"ASP.NET_SessionId": "gxk4jtbs44m2ihirkmcxyxgp"}
 
-URL = "http://api.pjxx866.com/web/admio/a_calllog.aspx"
+URL = "/web/admio/a_calllog.aspx"
 
 TIME_PATTERN = "%Y-%m-%d %H:%M:%S"
 
