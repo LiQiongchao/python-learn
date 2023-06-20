@@ -3,6 +3,8 @@
 # 第一部分 基本知识
 ## 配置 sublime 运行环境
 ### 配置
+> [Sublime Text 3 修改Side Bar（侧边栏）字体大小](https://blog.csdn.net/taolusi/article/details/81074086)
+
 单击Sublime Text图标以启动它，也可在搜索栏中输入Sublime Text来找到它再
 启动。选择菜单Tools ▶ Build System ▶ New Build System，新建一个配置文件。删
 除该文件中的所有内容，再输入如下内容：
