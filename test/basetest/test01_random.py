@@ -4,7 +4,7 @@
 """
 @Author  : Liqc
 @Date    : 2024/1/25
-@Description: 随机数查询
+@Description: 随机数查询，数据抽样
 """
 import random
 from datetime import time
