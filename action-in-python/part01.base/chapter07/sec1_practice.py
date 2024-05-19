@@ -32,6 +32,9 @@ def order_seat():
 
 
 def ten_multiple():
+    """
+    输入一个数是否能被10整除
+    """
     num = input("Please input a number: ")
     num = int(num)
     if num % 10 == 0:
